@@ -29,28 +29,19 @@ Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installi
 Clone/git pull the repo into any local directory
 
 ```
-$ git clone https://github.com/intersystems-community/iris-oas-test-gen.git
+$ git clone https://github.com/musketeers-br/iris-oas-test-gen.git
 ```
 
 Open the terminal in this directory and call the command to build and run InterSystems IRIS in container:
 *Note: Users running containers on a Linux CLI, should use "docker compose" instead of "docker-compose"*
 *See [Install the Compose plugin](https://docs.docker.com/compose/install/linux/)*
 
-
-
 ```
 $ docker-compose up -d
 ```
 
-To open IRIS Terminal do:
+# Running
 
-```
-$ docker-compose exec iris iris session iris -U IRISAPP
-IRISAPP>
-```
-
-To exit the terminal, do any of the following:
-
-```
-Enter HALT or H (not case-sensitive)
+```shell
+java -jar openapi-generator-cli.jar generate -i  ~/dev/assets/person-api.json -g python -o teste
 ```

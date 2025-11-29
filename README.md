@@ -24,24 +24,49 @@ Once you clone the new repo to your laptop and open VSCode (with the [InterSyste
 ## Prerequisites
 Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker desktop](https://www.docker.com/products/docker-desktop) installed.
 
-## Installation
+## Generating test classes
 
 Clone/git pull the repo into any local directory
 
-```
-$ git clone https://github.com/musketeers-br/iris-oas-test-gen.git
+```shell
+git clone https://github.com/musketeers-br/iris-oas-test-gen.git
+cd iris-oas-test-gen
+chmod -R o+w .
 ```
 
-Open the terminal in this directory and call the command to build and run InterSystems IRIS in container:
+Build and run InterSystems IRIS in container:
 *Note: Users running containers on a Linux CLI, should use "docker compose" instead of "docker-compose"*
 *See [Install the Compose plugin](https://docs.docker.com/compose/install/linux/)*
 
-```
-$ docker-compose up -d
+```shell
+docker-compose up -d
 ```
 
-# Running
+With the container built and running, let's access the IRIS terminal
 
 ```shell
-java -jar openapi-generator-cli.jar generate -i  ~/dev/assets/person-api.json -g python -o teste
+docker exec -it iris-oas-test-gen-iris-1 /bin/bash
+iris session iris -U IRISAPP
 ```
+
+Now, we can generate the tests classes. For this example, this [toy REST API specification](./assets/person-api.json) will be used.
+
+```objectscript
+Set openapiFile = "/home/irisowner/dev/assets/person-api.json"
+Write ##class(dc.musketeers.irisOasTestGen.Main).Run(openapiFile)
+```
+
+By default the output files are stored in `/usr/irissys/lib/iris-oas-test-gen/generated-iris-client/src`. Let's copy them to the mounted volume and allow edition.
+
+```shell
+cp -r /usr/irissys/lib/iris-oas-test-gen/generated-iris-client/src /home/irisowner/dev/tests
+chmod -R o+w /home/irisowner/dev/tests/src
+```
+
+Now open VSCode on the project dir.
+
+```shell
+code .
+```
+
+You can check the generated files inside dir tests.

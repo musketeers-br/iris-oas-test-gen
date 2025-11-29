@@ -1,0 +1,105 @@
+Class {{apiPackage}}.Tests{{classname}} Extends %UnitTest.TestCase
+{
+
+/// Property to hold the base URL of the API
+Property BasePath As %String [ InitialExpression = "{{basePath}}" ];
+
+{{#operations}}
+{{#operation}}
+/// Unit test for {{operationId}}
+Method Test{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}()
+{
+    // TODO:
+    {{#allParams}}
+    // Set p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}} = ""
+    {{/allParams}}
+    // Set httpResponse = ..{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
+        {{#allParams}}
+    //     p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}{{^-last}},{{/-last}}
+        {{/allParams}}
+    // )
+}
+
+{{/operation}}
+{{/operations}}
+/// Common method to execute an HTTP request
+Method SendRequest(
+    pMethod As %String, 
+    pPath As %String, 
+    pQueryParams As %String = "", 
+    pBody As %Stream.Object = ""
+) As %Net.HttpResponse
+{
+    Set httpRequest = ##class(%Net.HttpRequest).%New()
+    Set httpRequest.Https = 0
+    Set httpRequest.Username = "_system"
+    Set httpRequest.Password = "SYS"
+    Set httpRequest.ContentType = "application/json"
+    #; Set up headers if needed
+    #; httpRequest.SetHeader("Content-Type", "application/json")
+
+    Set path = $PIECE(pPath, "?", 1)
+    Set fullPath = ..BasePath _ path _ pQueryParams
+    
+    If (pMethod = "POST") {
+        If ($ISOBJECT(pBody)) {
+            $$$ThrowOnError(httpRequest.EntityBody.CopyFrom(pBody))
+        }
+        $$$ThrowOnError(httpRequest.Post(fullPath))
+
+    } ElseIf (pMethod = "GET") {
+        $$$ThrowOnError(httpRequest.Get(fullPath))
+
+    } ElseIf (pMethod = "PUT") {
+        If ($ISOBJECT(pBody)) {
+            $$$ThrowOnError(httpRequest.EntityBody.CopyFrom(pBody))
+        }
+        Set httpResponse = httpRequest.Put(fullPath)
+
+    } ElseIf (pMethod = "DELETE") {
+        Set httpResponse = httpRequest.Delete(fullPath)
+
+    } Else {
+        Throw ##class(%Exception.General).%New("Unsupported HTTP method: " _ pMethod)
+    }
+    
+    Return httpRequest.HttpResponse
+}
+
+{{#operations}}
+{{#operation}}
+/// {{summary}}
+/// OperationId: {{operationId}}
+Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
+    {{#allParams}}
+    p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}} As {{dataType}}{{^-last}},
+    {{/-last}}
+    {{/allParams}}
+) As %Net.HttpResponse
+{
+    Set path = "{{path}}"
+    Set queryParams = ""
+    Set bodyStream = ""
+    {{#pathParams}}
+
+    Set path = $REPLACE(path, "{{paramName}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}})
+    {{/pathParams}}
+    {{#queryParams}}
+
+    Set queryParams = queryParams _ "&" _ "{{name}}=" _ p{{name}}
+    If $EXTRACT(queryParams) = "&" Set queryParams = "?" _ $EXTRACT(queryParams, 2, *)
+    {{/queryParams}}
+    {{#bodyParam}}
+
+    // Handle body
+    $$$ThrowOnError(p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}.%JSONExportToStream(.bodyStream))
+    {{/bodyParam}}
+
+    Set httpResponse = ..SendRequest("{{httpMethod}}", path, queryParams, bodyStream)
+    // TODO: Add logic to parse httpResponse.Data and return a Model object if returnType is defined
+    Return httpResponse
+}
+
+{{/operation}}
+{{/operations}}
+}

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-  <Document name="dc-sample.ZPM">
+  <Document name="iris-oas-test-gen.ZPM">
     <Module>
-      <Name>dc-sample</Name>
-      <Version>2.0.11</Version>
-      <Description>Basic InterSystems IRIS Development Template</Description>
+      <Name>iris-oas-test-gen</Name>
+      <Version>0.0.1</Version>
+      <Description>OpenAPI Specification (OAS) generator for Intersystems IRIS REST API client tests written in ObjectScript.</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
-      <Resource Name="dc.sample.PKG"/>
-      <UnitTest Name="/tests" Package="dc.sample.unittests" Phase="test"/>
-
+      <Resource Name="dc.musketeers.irisOasTestGen.PKG"/>
+      <UnitTest Name="/tests" Package="dc.musketeers.irisOasTestGen.unittests" Phase="test"/>
+      <FileCopy Name="/java/dist/iris-object-script-openapi-generator-1.0.0.jar" Target="${libdir}iris-oas-test-gen/iris-object-script-openapi-generator-1.0.0.jar"/>
+      <FileCopy Name="/java/dist/openapi-generator-cli.jar" Target="${libdir}iris-oas-test-gen/openapi-generator-cli.jar"/>
     </Module>
   </Document>
 </Export>

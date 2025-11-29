@@ -14,7 +14,7 @@ WORKDIR /home/irisowner/dev
 ##USER ${ISC_PACKAGE_MGRUSER}
 
 ARG TESTS=0
-ARG MODULE="dc-sample"
+ARG MODULE="iris-oas-test-gen"
 ARG NAMESPACE="IRISAPP"
 
 ## Embedded Python environment

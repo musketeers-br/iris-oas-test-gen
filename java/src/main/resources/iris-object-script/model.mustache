@@ -1,0 +1,11 @@
+Class {{modelPackage}}.{{classname}} Extends (%RegisteredObject, %JSON.Adaptor)
+{
+{{#models}}
+{{#model}}
+{{#vars}}
+Property {{name}} As {{dataType}};
+
+{{/vars}}
+{{/model}}
+{{/models}}
+}

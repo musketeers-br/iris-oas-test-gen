@@ -51,7 +51,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 zpm "load /home/irisowner/dev"
 
-zpm "test dc-sample"
+zpm "test iris-oas-test-gen"
 ```
 
 ## select zpm test registry

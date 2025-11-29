@@ -9,8 +9,8 @@ services:
       - ISC_CPF_MERGE_FILE=/home/irisowner/dev/merge.cpf
     command: --check-caps false --ISCAgent false
     ports:
-      - 1972
-      - 52773
-      - 53773
+      - 51206:1972
+      - 51207:52773
+      - 51208:53773
     volumes:
       - ./:/home/irisowner/dev

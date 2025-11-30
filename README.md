@@ -19,14 +19,10 @@ This tool is an OpenAPI Generator designed specifically for Intersystems IRIS. I
 
 **Target Audience:** IRIS developers, QA engineers, and DevOps teams looking to integrate automated testing into their Intersystems IRIS ObjectScript projects.
 
-## Usage
-Start a new dev repository with InterSystems IRIS using this one as a template.
-Once you clone the new repo to your laptop and open VSCode (with the [InterSystems ObjectScript Extension Pack](https://marketplace.visualstudio.com/items?itemName=intersystems-community.objectscript-pack) installed) you'll be able to start development immediately.
-
 ## Prerequisites
 Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker desktop](https://www.docker.com/products/docker-desktop) installed.
 
-## Generating test classes
+## Usage
 
 Clone/git pull the repo into any local directory
 
@@ -48,6 +44,8 @@ With the container built and running, let's access the IRIS terminal
 
 ```shell
 docker exec -it iris-oas-test-gen-iris-1 /bin/bash
+```
+```shell
 iris session iris -U IRISAPP
 ```
 
@@ -65,6 +63,7 @@ By default the output files are stored in `/tmp/output/src`. Let's copy them to 
 ```shell
 cp -r /tmp/output/src /home/irisowner/dev/tests
 chmod -R o+w /home/irisowner/dev/tests/src # allow edition in the host machine
+exit
 ```
 
 Now open VSCode on the project dir.

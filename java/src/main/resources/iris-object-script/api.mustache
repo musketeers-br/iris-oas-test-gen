@@ -35,8 +35,6 @@ Method SendRequest(
     Set httpRequest.Username = "_system"
     Set httpRequest.Password = "SYS"
     Set httpRequest.ContentType = "application/json"
-    #; Set up headers if needed
-    #; httpRequest.SetHeader("Content-Type", "application/json")
 
     Set path = $PIECE(pPath, "?", 1)
     Set fullPath = ..BasePath _ path _ pQueryParams
@@ -96,7 +94,6 @@ Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
     {{/bodyParam}}
 
     Set httpResponse = ..SendRequest("{{httpMethod}}", path, queryParams, bodyStream)
-    // TODO: Add logic to parse httpResponse.Data and return a Model object if returnType is defined
     Return httpResponse
 }
 

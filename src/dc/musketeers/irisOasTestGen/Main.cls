@@ -41,14 +41,8 @@ Method Generate() As %Status
         If ..OpenapiSpec = "" {
             Throw ##class(%Exception.General).%New("Property 'OpenapiSpec' cannot be empty.")
         }
-        #; If '##class(%File).Exists(..OpenapiSpec) {
-        #;     Throw ##class(%Exception.General).%New("OpenAPI spec file '" _ ..OpenapiSpec _ "' not found.")
-        #; }
         If ..OutputDir = "" {
             Throw ##class(%Exception.General).%New("Property 'OutputDir' cannot be empty.")
-        }
-        If '##class(%File).Exists(..OutputDir) {
-            Throw ##class(%Exception.General).%New("Output directory '" _ ..OutputDir _ "' does not exist.")
         }
 
         Set outFile = ##class(%Library.File).TempFilename()

@@ -31,21 +31,6 @@ Method TestGenerateEmptyOutputDir()
     Do $$$AssertTrue($System.Status.GetErrorText(sc) [ "Property 'OutputDir' cannot be empty.", "Error message should mention empty OutputDir" )
 }
 
-/// Test Generate method when OutputDir does not exist.
-Method TestGenerateNonExistentOutputDir()
-{
-    Set main = ##class(dc.musketeers.irisOasTestGen.Main).%New()
-    Set main.OpenapiSpec = ..#OpenAPISpecPath
-    Set nonExistentDir = "/path/that/does/not/exist/" _ $RANDOM(99999)
-    Set main.OutputDir = nonExistentDir
-    
-    Set sc = main.Generate()
-    
-    Do $$$AssertStatusNotOK(sc, "Generate should fail when OutputDir does not exist")
-    Set expectedError = "Output directory '" _ nonExistentDir _ "' does not exist."
-    Do $$$AssertTrue($System.Status.GetErrorText(sc) [ expectedError, "Error message should mention non-existent directory" )
-}
-
 /// Test Generate method success case with no custom template.
 Method TestGenerateSuccess()
 {

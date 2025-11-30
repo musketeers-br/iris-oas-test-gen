@@ -31,7 +31,7 @@ Clone/git pull the repo into any local directory
 ```shell
 git clone https://github.com/musketeers-br/iris-oas-test-gen.git
 cd iris-oas-test-gen
-chmod -R o+w .
+chmod -R o+w tests # allow container processes to write in the tests directory
 ```
 
 Build and run InterSystems IRIS in container:
@@ -53,14 +53,16 @@ Now, we can generate the tests classes. For this example, this [toy REST API spe
 
 ```objectscript
 Set openapiFile = "/home/irisowner/dev/assets/person-api.json"
-Write ##class(dc.musketeers.irisOasTestGen.Main).Run(openapiFile)
+Set outputDir = "/tmp/output"
+Write ##class(dc.musketeers.irisOasTestGen.Main).Run(openapiFile, outputDir)
+Halt
 ```
 
-By default the output files are stored in `/usr/irissys/lib/iris-oas-test-gen/generated-iris-client/src`. Let's copy them to the mounted volume and allow edition.
+By default the output files are stored in `/tmp/output/src`. Let's copy them to the mounted volume and allow edition.
 
 ```shell
-cp -r /usr/irissys/lib/iris-oas-test-gen/generated-iris-client/src /home/irisowner/dev/tests
-chmod -R o+w /home/irisowner/dev/tests/src
+cp -r /tmp/output/src /home/irisowner/dev/tests
+chmod -R o+w /home/irisowner/dev/tests/src # allow edition in the host machine
 ```
 
 Now open VSCode on the project dir.
@@ -70,3 +72,7 @@ code .
 ```
 
 You can check the generated files inside dir tests.
+
+![Model for tests created form the OpenAPI Specification](./assets/img/person-model.png)
+
+![API test created form the OpenAPI Specification](./assets/img/person-api.png)

@@ -115,12 +115,12 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
         /**
          * Api Package.  Optional, if needed, this can be used in templates
          */
-        apiPackage = "org.openapitools.api";
+        apiPackage = "api";
 
         /**
          * Model Package.  Optional, if needed, this can be used in templates
          */
-        modelPackage = "org.openapitools.model";
+        modelPackage = "model";
 
         // /**
         //  * Reserved words.  Override this with reserved words specific to your language

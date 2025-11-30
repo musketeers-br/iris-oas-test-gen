@@ -8,6 +8,8 @@
 
 This tool is an OpenAPI Generator designed specifically for Intersystems IRIS. It ingests an OpenAPI Specification (Swagger) document and automatically produces robust, maintainable, and executable **ObjectScript code** to validate your IRIS REST APIs.
 
+> 🚧 Note: Some data types aren't still covered, like List and File. Those will be added in the next releases.
+
 **Key Features:**
 
 * **Specification-Driven Testing:** Ensure your API implementation strictly adheres to the defined OAS contract.

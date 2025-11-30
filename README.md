@@ -74,6 +74,6 @@ code .
 
 You can check the generated files inside dir tests.
 
-![Model for tests created form the OpenAPI Specification](./assets/img/person-model.png)
+![Model for tests created form the OpenAPI Specification](https://raw.githubusercontent.com/musketeers-br/iris-oas-test-gen/refs/heads/master/assets/img/person-model.png)
 
-![API test created form the OpenAPI Specification](./assets/img/person-api.png)
+![API test created form the OpenAPI Specification](https://raw.githubusercontent.com/musketeers-br/iris-oas-test-gen/refs/heads/master/assets/img/person-api.png)

@@ -6,6 +6,8 @@ import io.swagger.models.properties.*;
 
 import java.util.*;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IrisObjectScriptGenerator extends DefaultCodegen implements CodegenConfig {
 
@@ -223,6 +225,66 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
             return modelPackage() + "." + modelName; 
         }
         return modelName;
+    }
+    
+    @Override
+    @SuppressWarnings("unused")
+    public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+        // 1. Mapeamento de Tipos com Formato Específico (DateTime, Date)
+        // O CodegenProperty já traduziu o 'type' base, mas o 'format' nos permite refinar.
+
+        if (property.dataFormat != null) {
+            switch (property.dataFormat.toLowerCase()) {
+                case "date-time":
+                    // Exemplo: {"type":"string", "format":"date-time"} -> %DateTime
+                    property.dataType = "%DateTime";
+                    
+                    // Adiciona uma extensão para facilitar a identificação no template (opcional, mas útil)
+                    property.vendorExtensions.put("x-is-datetime", true);
+                    break;
+                    
+                case "date":
+                    // Exemplo: {"type":"string", "format":"date"} -> %Date
+                    property.dataType = "%Date";
+                    property.vendorExtensions.put("x-is-date", true);
+                    break;
+                    
+                case "double":
+                case "float":
+                    // Exemplo: {"type":"number", "format":"double"} ou {"type":"number", "format":"float"} -> %Double
+                    property.dataType = "%Double";
+                    property.vendorExtensions.put("x-is-double", true);
+                    break;
+
+                case "binary":
+                    // Exemplo: {"type":"string", "format":"binary"} -> %Stream.GlobalBinary ou %Binary
+                    // Dependendo do seu estilo de codificação em IRIS
+                    property.dataType = "%Stream.GlobalBinary"; 
+                    property.vendorExtensions.put("x-is-binary", true);
+                    break;
+
+                // Você pode adicionar mais casos para outros formatos como "uuid", etc.
+            }
+        }
+
+        // 2. Mapeamento de Tipos Base (que podem não ter 'format' definido)
+        // Se o 'dataType' ainda for o mapeamento padrão de 'string', podemos refinar.
+        
+        // Se a propriedade é um array (list), precisamos garantir que o tipo do item seja processado
+        if (property.isContainer && property.items != null) {
+            // Isso garantirá que o tipo dentro da lista, se aplicável, seja processado
+            // (Embora o OpenAPI Generator geralmente faça isso em etapas anteriores, é uma boa prática verificar)
+            postProcessModelProperty(model, property.items);
+        }
+        
+        // Exemplo de Mapeamento Adicional/Default (caso não tenha sido tratado no typeMapping)
+        if ("integer".equalsIgnoreCase(property.dataType) && property.dataFormat == null) {
+            property.dataType = "%Integer";
+        } else if ("boolean".equalsIgnoreCase(property.dataType) && property.dataFormat == null) {
+            property.dataType = "%Boolean";
+        }
+        // Nota: Os tipos básicos como String, Integer, etc., geralmente são mapeados em typeMapping(). 
+        // Esta função foca primariamente em refinar pelo 'format'.
     }
 
 }

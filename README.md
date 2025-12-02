@@ -75,7 +75,7 @@ You can check the generated files inside dir tests.
 
 ![API test created form the OpenAPI Specification](https://raw.githubusercontent.com/musketeers-br/iris-oas-test-gen/refs/heads/master/assets/img/person-api.png)
 
-Now you have templates with client call for each oeration in OpenAPI specification and the corresponding test method for your implementation. For instance:
+Now you have templates with client calls for each operation in the OpenAPI specification and the corresponding test method for your implementation. For instance:
 
 ```objectscript
 /// Create a new Person record

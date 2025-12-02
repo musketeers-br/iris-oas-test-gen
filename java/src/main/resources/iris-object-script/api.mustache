@@ -77,7 +77,6 @@ Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
     Set request = ##class(utils.HttpUtils).%New()
     Set request.BasePath = ..#BasePath
     Set request.HttpRequest.Https = 1
-    // SendRequest(pMethod, pPath, pQueryParams, pBody, pHeaders, pFormParams, pMultipartParams)
     Set httpResponse = request.SendRequest("{{httpMethod}}", path, queryParams, bodyStream, headers, formParams, multipartParams)
     Return httpResponse
 }

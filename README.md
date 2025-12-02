@@ -1,12 +1,9 @@
  [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/iris-oas-test-gen)
- [![Quality Gate Status](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Firis-oas-test-gen&metric=alert_status)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Firis-oas-test-gen)
- [![Reliability Rating](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Firis-oas-test-gen&metric=reliability_rating)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Firis-oas-test-gen)
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat&logo=AdGuard)](LICENSE)
 
 # 🚀 IrisOASTestGen: Automated ObjectScript REST Test Generation
 
-This tool is an OpenAPI Generator designed specifically for Intersystems IRIS. It ingests an OpenAPI Specification (Swagger) document and automatically produces robust, maintainable, and executable **ObjectScript code** to validate your IRIS REST APIs.
+This tool is an OpenAPI Generator designed specifically for Intersystems IRIS. It ingests an OpenAPI Specification 2.0 (Swagger) document and automatically produces robust, maintainable, and executable **ObjectScript code** to validate your IRIS REST APIs.
 
 > 🚧 Note: Some data types aren't still covered, like List and File. Those will be added in the next releases.
 
@@ -14,7 +11,7 @@ This tool is an OpenAPI Generator designed specifically for Intersystems IRIS. I
 
 * **Specification-Driven Testing:** Ensure your API implementation strictly adheres to the defined OAS contract.
 * **ObjectScript Native:** Generates client-side testing classes ready to run directly within the IRIS environment.
-* **Rapid Development:** Dramatically accelerates the creation of integration and regression test suites for IRIS REST services.
+* **Rapid Development:** Helps to accelerate the creation of integration and regression test suites for IRIS REST services.
 * **Comprehensive Coverage:** Supports validation of endpoints, parameters, request bodies, and expected response schemas.
 
 **Target Audience:** IRIS developers, QA engineers, and DevOps teams looking to integrate automated testing into their Intersystems IRIS ObjectScript projects.
@@ -52,7 +49,7 @@ iris session iris -U IRISAPP
 Now, we can generate the tests classes. For this example, this [toy REST API specification](./assets/person-api.json) will be used.
 
 ```objectscript
-Set openapiFile = "/home/irisowner/dev/assets/person-api.json"
+Set openapiFile = "/home/irisowner/dev/assets/petstore.json"
 Set outputDir = "/tmp/output"
 Write ##class(dc.musketeers.irisOasTestGen.Main).Run(openapiFile, outputDir)
 Halt
@@ -77,3 +74,12 @@ You can check the generated files inside dir tests.
 ![Model for tests created form the OpenAPI Specification](https://raw.githubusercontent.com/musketeers-br/iris-oas-test-gen/refs/heads/master/assets/img/person-model.png)
 
 ![API test created form the OpenAPI Specification](https://raw.githubusercontent.com/musketeers-br/iris-oas-test-gen/refs/heads/master/assets/img/person-api.png)
+
+## 🎖️ Credits
+Artisan is developed with ❤️ by the Musketeers Team
+
+* [José Roberto Pereira](https://community.intersystems.com/user/jos%C3%A9-roberto-pereira-0)
+* [Henry Pereira](https://community.intersystems.com/user/henry-pereira)
+* [Henrique Dias](https://community.intersystems.com/user/henrique-dias-2)
+
+![3Musketeers-br](./assets/3musketeers.png)

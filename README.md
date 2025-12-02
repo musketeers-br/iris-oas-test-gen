@@ -49,7 +49,7 @@ iris session iris -U IRISAPP
 Now, we can generate the tests classes. For this example, this [toy REST API specification](./assets/person-api.json) will be used.
 
 ```objectscript
-Set openapiFile = "/home/irisowner/dev/assets/petstore.json"
+Set openapiFile = "/home/irisowner/dev/assets/person-api.json"
 Set outputDir = "/tmp/output"
 Write ##class(dc.musketeers.irisOasTestGen.Main).Run(openapiFile, outputDir)
 Halt
@@ -74,6 +74,46 @@ You can check the generated files inside dir tests.
 ![Model for tests created form the OpenAPI Specification](https://raw.githubusercontent.com/musketeers-br/iris-oas-test-gen/refs/heads/master/assets/img/person-model.png)
 
 ![API test created form the OpenAPI Specification](https://raw.githubusercontent.com/musketeers-br/iris-oas-test-gen/refs/heads/master/assets/img/person-api.png)
+
+Now you have templates with client call for each oeration in OpenAPI specification and the corresponding test method for your implementation. For instance:
+
+```objectscript
+/// Create a new Person record
+/// OperationId: createPerson
+Method CreatePerson(
+    pPerson As model.Person) As %Net.HttpResponse
+{
+    Set path = "/"
+    Set queryParams = ""
+    Set bodyStream = ""
+    Set headers = ##class(%ListOfDataTypes).%New()
+    Set formParams = ##class(%ListOfDataTypes).%New()
+    Set multipartParams = ##class(%ListOfDataTypes).%New()
+    
+    // Handle body
+    $$$ThrowOnError(pPerson.%JSONExportToStream(.bodyStream))
+
+    Set request = ##class(utils.HttpUtils).%New()
+    Set request.BasePath = ..#BasePath
+    Set request.HttpRequest.Https = 1
+    Set httpResponse = request.SendRequest("POST", path, queryParams, bodyStream, headers, formParams, multipartParams)
+    Return httpResponse
+}
+
+/// Unit test for createPerson
+Method TestCreatePerson()
+{
+    // TODO:
+    // Set pPerson = ""
+    // Set httpResponse = ..CreatePerson(
+    //     pPerson
+    // )
+}
+```
+
+## Custome template
+
+todo:
 
 ## 🎖️ Credits
 Artisan is developed with ❤️ by the Musketeers Team

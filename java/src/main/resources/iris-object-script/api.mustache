@@ -31,6 +31,7 @@ Method SendRequest(
 ) As %Net.HttpResponse
 {
     Set httpRequest = ##class(%Net.HttpRequest).%New()
+    Set httpRequest.Server = "localhost"
     Set httpRequest.Https = 0
     Set httpRequest.Username = "_system"
     Set httpRequest.Password = "SYS"

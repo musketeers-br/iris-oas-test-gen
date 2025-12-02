@@ -9,8 +9,12 @@
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="dc.musketeers.irisOasTestGen.PKG"/>
       <UnitTest Name="/tests" Package="dc.musketeers.irisOasTestGen.unittests" Phase="test"/>
+      <UnitTest Name="/tests" Package="dc.musketeers.irisOasTestGen.integrationtests" Phase="verify"/>
       <FileCopy Name="/java/dist/iris-object-script-openapi-generator-1.0.0.jar" Target="${libdir}iris-oas-test-gen/iris-object-script-openapi-generator-1.0.0.jar"/>
       <FileCopy Name="/java/dist/openapi-generator-cli.jar" Target="${libdir}iris-oas-test-gen/openapi-generator-cli.jar"/>
+      <AfterInstallMessage>
+        Module installed successfully! 
+      </AfterInstallMessage>
     </Module>
   </Document>
 </Export>

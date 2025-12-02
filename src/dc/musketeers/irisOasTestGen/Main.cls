@@ -69,6 +69,7 @@ Method Generate() As %Status
             Set args($INCREMENT(args)) = ..TemplateLocation
         }
         Set flags = "/STDOUT="""_outFile_"""/STDERR="""_outFile_""""
+        #; Set flags = ""
         #; Set exitCode = $ZF(-100, flags, program, args...)
         Set exitCode = ..Shell.Execute(flags, program, args...)
 

@@ -1,3 +1,4 @@
+/// based on https://www.baeldung.com/java-openapi-custom-generator
 package br.musketeers.codegen.iris;
 
 import org.openapitools.codegen.*;
@@ -83,11 +84,9 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
         typeMapping.put("date-time", "%TimeStamp");
         typeMapping.put("password", "%String");
         typeMapping.put("byte", "%String");
+        typeMapping.put("array", "%ListOfObjects"); 
+        typeMapping.put("file", "%Stream.FileBinary"); 
         // Add more as needed, e.g., for arrays
-        // typeMapping.put("array", "%ListOfObjects"); 
-        
-        // Customize your date/datetime format if necessary for IRIS Date/Time handling
-        // dateLibrary = "iris"; // Example, might need custom implementation
 
         /**
          * Models.  You can write model files using the modelTemplateFiles map.
@@ -139,6 +138,16 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
          */
         additionalProperties.put("apiVersion", apiVersion);
 
+        /**
+         * Supporting Files.  You can write single files for the generator with the
+         * entire object tree available.  If the input file has a suffix of `.mustache
+         * it will be processed by the template engine.  Otherwise, it will be copied
+         */
+        supportingFiles.add(new SupportingFile("HttpUtils.mustache",   // the input template or file
+        "",                                                       // the destination folder, relative `outputFolder`
+        sourceFolder+"/utils/HttpUtils.cls")                                          // the output file
+        );
+        
         // /**
         //  * Supporting Files.  You can write single files for the generator with the
         //  * entire object tree available.  If the input file has a suffix of `.mustache
@@ -149,15 +158,15 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
         // "myFile.sample")                                          // the output file
         // );
 
-        /**
-         * Language Specific Primitives.  These types will not trigger imports by
-         * the client generator
-         */
-        languageSpecificPrimitives = new HashSet<String>(
-            Arrays.asList(
-                "Type1",      // replace these with your types
-                "Type2")
-        );
+        // /**
+        //  * Language Specific Primitives.  These types will not trigger imports by
+        //  * the client generator
+        //  */
+        // languageSpecificPrimitives = new HashSet<String>(
+        //     Arrays.asList(
+        //         "Type1",      // replace these with your types
+        //         "Type2")
+        // );
     }
 
   /**
@@ -168,7 +177,7 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
    */
     @Override
     public String escapeReservedWord(String name) {
-    return "_" + name;  // add an underscore to the name
+        return "_" + name;  // add an underscore to the name
     }
 
     /**
@@ -225,6 +234,11 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
             return modelPackage() + "." + modelName; 
         }
         return modelName;
+    }
+
+    @Override
+    @SuppressWarnings("unused")
+    public void postProcessParameter(CodegenParameter parameter) {
     }
     
     @Override

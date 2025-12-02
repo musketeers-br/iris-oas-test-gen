@@ -1,8 +1,8 @@
 Class {{apiPackage}}.Tests{{classname}} Extends %UnitTest.TestCase
 {
 
-/// Property to hold the base URL of the API
-Property BasePath As %String [ InitialExpression = "{{basePath}}" ];
+/// The base URL of the API
+Parameter BasePath = "{{host}}{{basePath}}";
 
 {{#operations}}
 {{#operation}}
@@ -22,48 +22,6 @@ Method Test{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}()
 
 {{/operation}}
 {{/operations}}
-/// Common method to execute an HTTP request
-Method SendRequest(
-    pMethod As %String, 
-    pPath As %String, 
-    pQueryParams As %String = "", 
-    pBody As %Stream.Object = ""
-) As %Net.HttpResponse
-{
-    Set httpRequest = ##class(%Net.HttpRequest).%New()
-    Set httpRequest.Server = "localhost"
-    Set httpRequest.Https = 0
-    Set httpRequest.Username = "_system"
-    Set httpRequest.Password = "SYS"
-    Set httpRequest.ContentType = "application/json"
-
-    Set path = $PIECE(pPath, "?", 1)
-    Set fullPath = ..BasePath _ path _ pQueryParams
-    
-    If (pMethod = "POST") {
-        If ($ISOBJECT(pBody)) {
-            $$$ThrowOnError(httpRequest.EntityBody.CopyFrom(pBody))
-        }
-        $$$ThrowOnError(httpRequest.Post(fullPath))
-
-    } ElseIf (pMethod = "GET") {
-        $$$ThrowOnError(httpRequest.Get(fullPath))
-
-    } ElseIf (pMethod = "PUT") {
-        If ($ISOBJECT(pBody)) {
-            $$$ThrowOnError(httpRequest.EntityBody.CopyFrom(pBody))
-        }
-        Set httpResponse = httpRequest.Put(fullPath)
-
-    } ElseIf (pMethod = "DELETE") {
-        Set httpResponse = httpRequest.Delete(fullPath)
-
-    } Else {
-        Throw ##class(%Exception.General).%New("Unsupported HTTP method: " _ pMethod)
-    }
-    
-    Return httpRequest.HttpResponse
-}
 
 {{#operations}}
 {{#operation}}
@@ -79,23 +37,59 @@ Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
     Set path = "{{path}}"
     Set queryParams = ""
     Set bodyStream = ""
+    Set headers = ##class(%ListOfDataTypes).%New()
+    Set formParams = ##class(%ListOfDataTypes).%New()
+    Set multipartParams = ##class(%ListOfDataTypes).%New()
+    
     {{#pathParams}}
 
     Set path = $REPLACE(path, "{{paramName}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}})
     {{/pathParams}}
     {{#queryParams}}
 
-    Set queryParams = queryParams _ "&" _ "{{name}}=" _ p{{name}}
+    Set queryParams = queryParams _ "&" _ "{{name}}=" _ p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}
     If $EXTRACT(queryParams) = "&" Set queryParams = "?" _ $EXTRACT(queryParams, 2, *)
     {{/queryParams}}
+    
+    {{#headerParams}}
+
+    // Header parameter: {{name}}
+    Do headers.Insert(..MakeParamObject("{{name}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}))
+    {{/headerParams}}
+    
+    {{#formParams}}
+        {{#isFile}}
+        // Multipart/form-data file parameter: {{name}}
+        Do multipartParams.Insert(..MakeParamObject("{{name}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}))
+        {{/isFile}}
+        {{^isFile}}
+        // Form parameter (x-www-form-urlencoded): {{name}}
+        Do formParams.Insert(..MakeParamObject("{{name}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}))
+        {{/isFile}}
+    {{/formParams}}
+    
     {{#bodyParam}}
 
     // Handle body
     $$$ThrowOnError(p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}.%JSONExportToStream(.bodyStream))
     {{/bodyParam}}
 
-    Set httpResponse = ..SendRequest("{{httpMethod}}", path, queryParams, bodyStream)
+    Set request = ##class(utils.HttpUtils).%New()
+    Set request.BasePath = ..#BasePath
+    Set request.HttpRequest.Https = 1
+    // SendRequest(pMethod, pPath, pQueryParams, pBody, pHeaders, pFormParams, pMultipartParams)
+    Set httpResponse = request.SendRequest("{{httpMethod}}", path, queryParams, bodyStream, headers, formParams, multipartParams)
     Return httpResponse
+}
+
+// Helper method to create parameter objects expected by SendRequest
+// Note: This helper method should be added to the generated client class
+Method MakeParamObject(pName As %String, pValue) As %RegisteredObject
+{
+    Set paramObj = ##class(%RegisteredObject).%New()
+    Set paramObj.Name = pName
+    Set paramObj.Value = pValue
+    Return paramObj
 }
 
 {{/operation}}

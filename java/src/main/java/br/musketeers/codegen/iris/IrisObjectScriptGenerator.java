@@ -89,7 +89,7 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
         outputFolder = "generated-code/iris-object-script";
 
         // Set the InterSystems IRIS type mappings
-        typeMapping.put("string", "%String");
+        typeMapping.put("string", "%String(MAXLEN=\"\")");
         typeMapping.put("integer", "%Integer");
         typeMapping.put("long", "%BigInt"); // for format: int64
         typeMapping.put("boolean", "%Boolean");
@@ -98,8 +98,8 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
         typeMapping.put("double", "%Double");
         typeMapping.put("date", "%Date");
         typeMapping.put("date-time", "%TimeStamp");
-        typeMapping.put("password", "%String");
-        typeMapping.put("byte", "%String");
+        typeMapping.put("password", "%String(MAXLEN=\"\")");
+        typeMapping.put("byte", "%String(MAXLEN=\"\")");
         typeMapping.put("array", "%ListOfObjects"); 
         typeMapping.put("file", "%Stream.FileBinary"); 
         // Add more as needed, e.g., for arrays

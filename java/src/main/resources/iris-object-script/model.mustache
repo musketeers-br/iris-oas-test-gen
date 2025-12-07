@@ -3,7 +3,10 @@ Class {{classname}} Extends (%RegisteredObject, %JSON.Adaptor)
 {{#models}}
 {{#model}}
 {{#vars}}
-Property {{name}} As {{dataType}};
+{{#never_render}}
+Using {{&dataType}} (unescaped) so quotes and = are not HTML-escaped, allowing modifiers like (MAXLEN="") be correctly rendered
+{{/never_render}}
+Property {{name}} As {{&dataType}};
 
 {{/vars}}
 {{/model}}

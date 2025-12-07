@@ -120,7 +120,7 @@ Method TestCreatePerson()
 [Generating, implementing and running tests for a simple OpenAPI 2.0 specification](./assets/md/implementation-example.md)
 
 ## 🎖️ Credits
-Artisan is developed with ❤️ by the Musketeers Team
+Iris OAS Test Gen is developed with ❤️ by the Musketeers Team
 
 * [José Roberto Pereira](https://community.intersystems.com/user/jos%C3%A9-roberto-pereira-0)
 * [Henry Pereira](https://community.intersystems.com/user/henry-pereira)

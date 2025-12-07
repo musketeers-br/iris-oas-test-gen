@@ -5,7 +5,7 @@
 
 This tool is an OpenAPI Generator designed specifically for Intersystems IRIS. It ingests an OpenAPI Specification 2.0 (Swagger) document and automatically produces robust, maintainable, and executable **ObjectScript code** to validate your IRIS REST APIs.
 
-> 🚧 Note: Some data types aren't still covered, like List and File. Those will be added in the next releases.
+> 🚧 Note: Some data types aren't still fully covered, like List and File. Those will be added in the next releases.
 
 **Key Features:**
 
@@ -16,10 +16,10 @@ This tool is an OpenAPI Generator designed specifically for Intersystems IRIS. I
 
 **Target Audience:** IRIS developers, QA engineers, and DevOps teams looking to integrate automated testing into their Intersystems IRIS ObjectScript projects.
 
-## Prerequisites
+## 🧰 Prerequisites
 Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker desktop](https://www.docker.com/products/docker-desktop) installed.
 
-## Usage
+## 📖 Basic Usage
 
 Clone/git pull the repo into any local directory
 
@@ -111,9 +111,9 @@ Method TestCreatePerson()
 }
 ```
 
-## Custome template
+## 🧭 Detailed walkthrough
 
-todo:
+[Generating, implementing and running tests for a simple OpenAPI 2.0 specification](./assets/md/implementation-example.md)
 
 ## 🎖️ Credits
 Artisan is developed with ❤️ by the Musketeers Team

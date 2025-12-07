@@ -25,4 +25,5 @@
 
     zpm "load /home/irisowner/dev/ -v":1:1
     do $SYSTEM.OBJ.Import("/home/irisowner/dev/src/dc/musketeers/irisOasTestGenDemo", "ck")
+    do ##class(dc.musketeers.irisOasTestGenDemo.personApi.Utils).CreateRestApi()
     halt

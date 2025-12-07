@@ -4,9 +4,33 @@ Class {{apiPackage}}.Tests{{classname}} Extends %UnitTest.TestCase
 /// The base URL of the API
 Parameter BasePath = "{{host}}{{basePath}}";
 
+/// Preparation method for the whole test
+Method OnBeforeAllTests() As %Status
+{
+	Return $$$OK
+}
+
+/// Cleanup method for the whole test
+Method OnAfterAllTests() As %Status
+{
+	Return $$$OK
+}
+
+/// Preparation method for each test
+Method OnBeforeOneTests(testname As %String) As %Status
+{
+	Return $$$OK
+}
+
+/// Cleanup method for each test
+Method OnAfterOneTest() As %Status
+{
+	Return $$$OK
+}
+
 {{#operations}}
 {{#operation}}
-/// Unit test for {{operationId}}
+/// Test for {{operationId}}
 Method Test{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}()
 {
     // TODO:
@@ -23,16 +47,20 @@ Method Test{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}()
 {{/operation}}
 {{/operations}}
 
+/// Helper method to create parameter objects expected by SendRequest
+Method MakeParamObject(pName As %String, pValue) As %RegisteredObject
+{
+    Set paramObj = ##class(%RegisteredObject).%New()
+    Set paramObj.Name = pName
+    Set paramObj.Value = pValue
+    Return paramObj
+}
+
 {{#operations}}
 {{#operation}}
 /// {{summary}}
 /// OperationId: {{operationId}}
-Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
-    {{#allParams}}
-    p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}} As {{dataType}}{{^-last}},
-    {{/-last}}
-    {{/allParams}}
-) As %Net.HttpResponse
+Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}({{#allParams}}p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}} As {{dataType}}{{^-last}},{{/-last}}{{/allParams}}) As %Net.HttpResponse
 {
     Set path = "{{path}}"
     Set queryParams = ""
@@ -42,8 +70,7 @@ Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
     Set multipartParams = ##class(%ListOfDataTypes).%New()
     
     {{#pathParams}}
-
-    Set path = $REPLACE(path, "{{paramName}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}})
+    Set path = $REPLACE(path, "{{=<% %>=}}{<%paramName%>}<%={{ }}=%>", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}})
     {{/pathParams}}
     {{#queryParams}}
 
@@ -74,21 +101,11 @@ Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
     $$$ThrowOnError(p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}.%JSONExportToStream(.bodyStream))
     {{/bodyParam}}
 
-    Set request = ##class(utils.HttpUtils).%New()
+    Set request = ##class({{x-musketeers-package-name}}.utils.HttpUtils).%New()
     Set request.BasePath = ..#BasePath
     Set request.HttpRequest.Https = 1
     Set httpResponse = request.SendRequest("{{httpMethod}}", path, queryParams, bodyStream, headers, formParams, multipartParams)
     Return httpResponse
-}
-
-// Helper method to create parameter objects expected by SendRequest
-// Note: This helper method should be added to the generated client class
-Method MakeParamObject(pName As %String, pValue) As %RegisteredObject
-{
-    Set paramObj = ##class(%RegisteredObject).%New()
-    Set paramObj.Name = pName
-    Set paramObj.Value = pValue
-    Return paramObj
 }
 
 {{/operation}}

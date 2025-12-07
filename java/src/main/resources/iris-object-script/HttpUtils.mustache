@@ -1,4 +1,4 @@
-Class utils.HttpUtils Extends %RegisteredObject
+Class {{x-musketeers-package-name}}.utils.HttpUtils Extends %RegisteredObject
 {
 
 Property HttpRequest As %Net.HttpRequest;
@@ -22,7 +22,7 @@ Method SendRequest(pMethod As %String, pPath As %String, pQueryParams As %String
     Set httpRequest.Server = ..BasePath
 
     // Apply headers
-    If $IsObject(pHeaders) {
+    If ($IsObject(pHeaders)) && (pHeaders.Count() > 0) {
         For i=1:1:pHeaders.Count() {
             Set headerName = pHeaders.GetAt(i).Name
             Set headerValue = pHeaders.GetAt(i).Value
@@ -31,7 +31,7 @@ Method SendRequest(pMethod As %String, pPath As %String, pQueryParams As %String
     }
 
     // Apply form parameters (x-www-form-urlencoded)
-    If $IsObject(pFormParams) {
+    If ($IsObject(pFormParams)) && (pFormParams.Count() > 0) {
         For i=1:1:pFormParams.Count() {
             Set formName = pFormParams.GetAt(i).Name
             Set formValue = pFormParams.GetAt(i).Value
@@ -41,7 +41,7 @@ Method SendRequest(pMethod As %String, pPath As %String, pQueryParams As %String
     }
 
     // Apply multipart/form-data parameters
-    If $IsObject(pMultipartParams) {
+    If ($IsObject(pMultipartParams)) && (pMultipartParams.Count() > 0) {
         For i=1:1:pMultipartParams.Count() {
             Set part = pMultipartParams.GetAt(i)
             // Expect each part to have Name, Value, and optionally Filename/ContentType

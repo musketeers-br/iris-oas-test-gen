@@ -3,7 +3,7 @@
   <Document name="iris-oas-test-gen.ZPM">
     <Module>
       <Name>iris-oas-test-gen</Name>
-      <Version>0.0.14</Version>
+      <Version>0.0.15</Version>
       <Description>OpenAPI Specification (OAS) generator for Intersystems IRIS REST API client tests written in ObjectScript.</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>

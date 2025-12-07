@@ -461,7 +461,7 @@ If all went as expected, you'll see an output with assertions:
 
 ## 5. Repository Reference
 
-To keep this article concise, the **complete implementation of tests** is available in the [here](https://github.com/musketeers-br/iris-oas-test-gen/blob/master/src/dc/musketeers/irisOasTestGenDemo/personApi/Utils.cls)
+To keep this article concise, the **complete implementation of tests** is available in the [here](https://github.com/musketeers-br/iris-oas-test-gen/blob/master/assets/md/implementation-example.md#5-completing-the-test-implementation)
 
 ---
 
@@ -487,6 +487,6 @@ In this walkthrough, we saw how to:
 
 The key takeaway: IrisOASTestGen is a **scaffolding tool**. It builds the skeleton and equips you with utilities, but the creative responsibility of designing robust test cases remains yours.  
 
-For the complete implementation of tests and further examples, check out the project repository [here](https://github.com/musketeers-br/iris-oas-test-gen/blob/master/src/dc/musketeers/irisOasTestGenDemo/personApi/Utils.cls).  
+For the complete implementation of tests and further examples, check out the project repository [here](https://github.com/musketeers-br/iris-oas-test-gen/blob/master/assets/md/implementation-example.md#5-completing-the-test-implementation).  
 
 ---

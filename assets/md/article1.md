@@ -78,10 +78,14 @@ ClassMethod Build()
 }
 ```
 
-Execute it:
+Access the IRIS terminal and execute:
+
+> Note: this tutorial expects you had an IRIS container built using the steps detailed [here](https://github.com/musketeers-br/iris-oas-test-gen?tab=readme-ov-file#-basic-usage).
 
 ```objectscript
 ZN "IRISAPP"
+Do $SYSTEM.OBJ.Import("/home/irisowner/dev/src/dc/musketeers/irisOasTestGenDemo", "ck")
+Do ##class(dc.musketeers.irisOasTestGenDemo.personApi.Utils).CreateRestApi()
 Do ##class(dc.musketeers.irisOasTestGenDemo.personApi.Utils).Build()
 ```
 

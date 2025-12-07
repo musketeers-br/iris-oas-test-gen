@@ -24,4 +24,5 @@
     set ^UnitTestRoot="/usr/irissys/.vscode/IRISAPP/UnitTestRoot"
 
     zpm "load /home/irisowner/dev/ -v":1:1
+    do $SYSTEM.OBJ.Import("/home/irisowner/dev/src/dc/musketeers/irisOasTestGenDemo", "ck")
     halt

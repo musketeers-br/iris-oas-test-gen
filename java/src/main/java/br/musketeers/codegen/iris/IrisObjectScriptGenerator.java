@@ -1,4 +1,5 @@
 /// based on https://www.baeldung.com/java-openapi-custom-generator
+/// https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator/src/main/java/org/openapitools/codegen/DefaultCodegen.java
 package br.musketeers.codegen.iris;
 
 import org.openapitools.codegen.*;
@@ -13,8 +14,13 @@ import java.util.Map;
 public class IrisObjectScriptGenerator extends DefaultCodegen implements CodegenConfig {
 
     // source folder where to write the files
-    protected String sourceFolder = "src";
+    // protected String sourceFolder = "src";
+    protected String sourceFolder = ".";
     protected String apiVersion = "1.0.0";
+    // The key that was used in the CLI: --additional-properties x-musketeers-package-name=...
+    public static final String MY_CUSTOM_PACKAGE_NAME = "x-musketeers-package-name";
+    // The package name of the generated classes
+    public String packageName = "mypackage";
 
     /**
      * Configures the type of generator.
@@ -64,6 +70,16 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
      */
     public String getHelp() {
         return "Generates an iris-object-script client library.";
+    }
+    
+    @Override
+    public String modelPackage() {
+        return packageName + "." + modelPackage;
+    }
+
+    @Override
+    public String apiPackage() {
+        return packageName + "." + apiPackage;
     }
 
     public IrisObjectScriptGenerator() {
@@ -137,16 +153,15 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
          * are available in models, apis, and supporting files
          */
         additionalProperties.put("apiVersion", apiVersion);
+        additionalProperties.put(MY_CUSTOM_PACKAGE_NAME, packageName);
 
-        /**
-         * Supporting Files.  You can write single files for the generator with the
-         * entire object tree available.  If the input file has a suffix of `.mustache
-         * it will be processed by the template engine.  Otherwise, it will be copied
-         */
-        supportingFiles.add(new SupportingFile("HttpUtils.mustache",   // the input template or file
-        "",                                                       // the destination folder, relative `outputFolder`
-        sourceFolder+"/utils/HttpUtils.cls")                                          // the output file
-        );
+        // /**
+        //  * Supporting Files.  You can write single files for the generator with the
+        //  * entire object tree available.  If the input file has a suffix of `.mustache
+        //  * it will be processed by the template engine.  Otherwise, it will be copied
+        //  *
+        // */
+        // supportingFiles.add();
         
         // /**
         //  * Supporting Files.  You can write single files for the generator with the
@@ -185,7 +200,8 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
      * instantiated
      */
     public String modelFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
+        char sep = File.separatorChar;
+        return outputFolder + sep + sourceFolder + sep + modelPackage().replace('.', sep);
     }
 
     /**
@@ -194,7 +210,8 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
      */
     @Override
     public String apiFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+        char sep = File.separatorChar;
+        return outputFolder + sep + sourceFolder + sep + apiPackage().replace('.', sep);
     }
 
     /**
@@ -299,6 +316,42 @@ public class IrisObjectScriptGenerator extends DefaultCodegen implements Codegen
         }
         // Nota: Os tipos básicos como String, Integer, etc., geralmente são mapeados em typeMapping(). 
         // Esta função foca primariamente em refinar pelo 'format'.
+    }
+    
+    // A common place to access and use custom properties is 
+    // in the postProcess* methods, but you can also use them 
+    // in methods that configure file generation, like:
+    @Override
+    public void processOpts() {
+        super.processOpts(); // IMPORTANT: Always call the super method first.
+        
+        // 1. Check if the property exists in the map
+        if (additionalProperties.containsKey(MY_CUSTOM_PACKAGE_NAME)) {
+            
+            // 2. Retrieve the value and cast it to String
+            String customPackage = (String) additionalProperties.get(MY_CUSTOM_PACKAGE_NAME);
+            
+            // 3. Use the value, for example, to set a standard package variable
+            packageName = customPackage;
+
+            char sep = File.separatorChar;
+
+            /**
+             * Supporting Files.  You can write single files for the generator with the
+             * entire object tree available.  If the input file has a suffix of `.mustache
+             * it will be processed by the template engine.  Otherwise, it will be copied
+             */
+            supportingFiles.add(
+                new SupportingFile(
+                    "HttpUtils.mustache",   // the input template or file
+                    "", // the destination folder, relative `outputFolder`
+                    sourceFolder + sep + packageName.replace('.', sep) + "/utils/HttpUtils.cls" // the output file
+                )
+            );
+        } else {
+            // Optional: Handle case where property is not passed
+            System.out.println("WARN: Custom package name not set. Using default.");
+        }
     }
 
 }

@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "host": "localhost:52773",
-  "basePath": "/api/dc/sample/person",
+  "basePath": "/dc/musketeers/irisOasTestGenDemo/personApi",
   "schemes": [
     "http"
   ],
@@ -101,7 +101,7 @@
             },
             "headers": {
               "Location": {
-                "description": "The full URI of the newly created Person resource. E.g. /api/dc/sample/person/1",
+                "description": "The full URI of the newly created Person resource. E.g. /dc/musketeers/irisOasTestGenDemo/personApi/1",
                 "type": "string"
               }
             }

@@ -474,6 +474,264 @@ Method OnAfterOneTest() As %Status
 }
 ```
 
+Now, we're all set to implement the tests for the others API operations.
+
+Tests for `getPersonById`:
+```objectscript
+/// Test for getPersonById
+Method TestGetPersonById()
+{
+    // --- Arrange: create a Person to have a valid ID ---
+    #Dim person As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set person.Name = "Jane Doe"
+    Set person.Title = "Product Manager"
+    Set person.Company = "InterSystems"
+    Set person.Phone = "555-987-6543"
+    Set person.DOB = $zdateh("1990-05-10", 3)
+
+    // Execute the create operation
+    Set httpCreate = ..CreatePerson(person)
+
+    // Parse create response
+    Set createString = httpCreate.Data.Read()
+    #dim createdPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set sc = createdPerson.%JSONImport(createString)
+
+    // --- Assertions for 201 Created ---
+    Do $$$AssertStatusOK(sc, "Person object for the test should be created successfully")
+    Do $$$AssertNotEquals(createdPerson.ID, "201", "Should return a valid ID after creation")
+
+    // --- Act: retrieve the Person by ID ---
+    Set pId = createdPerson.ID
+    Set httpResponse = ..GetPersonById(pId)
+
+    // Parse get response
+    Set responseString = httpResponse.Data.Read()
+    #dim retrievedPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set sc = retrievedPerson.%JSONImport(responseString)
+
+    // --- Assertions for 200 OK ---
+    Do $$$AssertEquals(httpResponse.StatusCode, 200, "GetPersonById should return 200 OK")
+    Do $$$AssertEquals($IsObject(retrievedPerson), 1, "GetPersonById response should be a parsed JSON object")
+    Do $$$AssertEquals(retrievedPerson.ID, pId, "GetPersonById: ID should match requested ID")
+    Do $$$AssertEquals(retrievedPerson.Name, person.Name, "GetPersonById: Name should match the created record")
+    Do $$$AssertEquals(retrievedPerson.Title, person.Title, "GetPersonById: Title should match the created record")
+    Do $$$AssertEquals(retrievedPerson.Company, person.Company, "GetPersonById: Company should match the created record")
+    Do $$$AssertEquals(retrievedPerson.Phone, person.Phone, "GetPersonById: Phone should match the created record")
+
+    // Headers per OpenAPI: ETag and Cache-Control should be present and non-empty
+    Set etag = httpResponse.GetHeader("ETag")
+    Set cacheControl = httpResponse.GetHeader("Cache-Control")
+    Do $$$AssertNotEquals(etag, "", "GetPersonById: ETag header should be present")
+    Do $$$AssertNotEquals(cacheControl, "", "GetPersonById: Cache-Control header should be present")
+
+    // --- Negative case: 404 Not Found for a non-existent ID ---
+    // Choose an unlikely ID (assuming OIDs are positive integers)
+    Set missingId = 987654321
+    Set httpMissing = ..GetPersonById(missingId)
+
+    // Parse missing response (expected Error schema)
+    Set missingString = httpMissing.Data.Read()
+    #; Set missingBody = ##class(%DynamicObject).%FromJSON(missingString)
+    #dim error As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error).%New()
+    Set sc = error.%JSONImport(missingString)
+
+    Do $$$AssertEquals(httpMissing.StatusCode, 404, "GetPersonById should return 404 for non-existent ID")
+    Do $$$AssertStatusOK(sc, "GetPersonById: Response should be a valid Error object")
+    Do $$$AssertEquals(error.code, 404, "GetPersonById: Error code should be 404")
+    Do $$$AssertNotEquals(error.message, "", "GetPersonById: Error message should be non-empty")
+}
+```
+
+Tests for `listPeople`:
+```objectscript
+/// Test for listPeople
+Method TestListPeople()
+{
+    // --- Precondition: after cleanup, the list should be empty ---
+    Set httpEmpty = ..ListPeople()
+    Set emptyString = httpEmpty.Data.Read()
+    #Dim emptyArray As %DynamicArray = ##class(%DynamicArray).%FromJSON(emptyString)
+
+    Do $$$AssertEquals(httpEmpty.StatusCode, 200, "ListPeople should return 200 OK even when empty")
+    Do $$$AssertTrue($IsObject(emptyArray), "ListPeople empty response should be a valid JSON array")
+    Do $$$AssertEquals(emptyArray.%Size(), 0, "ListPeople should return an empty array when no Person records exist")
+
+    // --- Arrange: create a few Person records to ensure the list is non-empty ---
+    #Dim person1 As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set person1.Name = "Alice Example"
+    Set person1.Title = "QA Engineer"
+    Set person1.Company = "InterSystems"
+    Set person1.Phone = "555-111-2222"
+    Set person1.DOB = $zdateh("1995-07-20", 3)
+    Set httpCreate1 = ..CreatePerson(person1)
+
+    #Dim person2 As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set person2.Name = "Bob Example"
+    Set person2.Title = "Developer"
+    Set person2.Company = "InterSystems"
+    Set person2.Phone = "555-333-4444"
+    Set person2.DOB = $zdateh("1988-03-15", 3)
+    Set httpCreate2 = ..CreatePerson(person2)
+
+    // --- Act: call the ListPeople operation ---
+    Set httpResponse = ..ListPeople()
+
+    // --- Parse the JSON array response ---
+    Set responseString = httpResponse.Data.Read()
+    #Dim peopleArray As %DynamicArray = ##class(%DynamicArray).%FromJSON(responseString)
+
+    // --- Assertions for 200 OK ---
+    Do $$$AssertEquals(httpResponse.StatusCode, 200, "ListPeople should return 200 OK")
+    Do $$$AssertTrue($IsObject(peopleArray), "ListPeople response should be a valid JSON array")
+
+    // The array should contain exactly 2 elements (since we created 2 persons above)
+    Do $$$AssertEquals(peopleArray.%Size(), 2, "ListPeople should return 2 Person records")
+
+    // --- Validate that returned objects have required fields ---
+    #Dim firstPerson As %DynamicObject = peopleArray.%Get(1)
+    Do $$$AssertNotEquals(firstPerson.ID, "", "ListPeople: Each Person should have a non-empty ID")
+    Do $$$AssertNotEquals(firstPerson.Name, "", "ListPeople: Each Person should have a non-empty Name")
+}
+```
+
+Tests for `updatePerson`:
+```objectscript
+/// Test for updatePerson
+Method TestUpdatePerson()
+{
+    // --- Arrange: create a Person to update ---
+    #Dim person As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set person.Name = "Charlie Original"
+    Set person.Title = "Intern"
+    Set person.Company = "InterSystems"
+    Set person.Phone = "555-000-1111"
+    Set person.DOB = $zdateh("2001-09-09", 3)
+
+    Set httpCreate = ..CreatePerson(person)
+
+    // Parse create response
+    Set createString = httpCreate.Data.Read()
+    #Dim createdPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set sc = createdPerson.%JSONImport(createString)
+
+    Do $$$AssertStatusOK(sc, "UpdatePerson: Person object for the test should be created successfully")
+    Do $$$AssertNotEquals(createdPerson.ID, "", "UpdatePerson: Created Person should have a non-empty ID")
+
+    // --- Act: update the Person record ---
+    Set pId = createdPerson.ID
+    #Dim updatedPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set updatedPerson.ID = pId
+    Set updatedPerson.Name = "Charlie Updated"
+    Set updatedPerson.Title = "Software Developer"
+    Set updatedPerson.Company = "InterSystems Corp"
+    Set updatedPerson.Phone = "555-999-8888"
+    Set updatedPerson.DOB = $zdateh("2001-09-09", 3)
+
+    Set httpResponse = ..UpdatePerson(pId, updatedPerson)
+
+    // Parse update response
+    Set responseString = httpResponse.Data.Read()
+    #Dim returnedPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set sc = returnedPerson.%JSONImport(responseString)
+
+    // --- Assertions for 200 OK ---
+    Do $$$AssertEquals(httpResponse.StatusCode, 200, "UpdatePerson should return 200 OK")
+    Do $$$AssertStatusOK(sc, "UpdatePerson: Response should be a valid Person object")
+    Do $$$AssertEquals(returnedPerson.ID, pId, "UpdatePerson: ID should remain unchanged after update")
+    Do $$$AssertEquals(returnedPerson.Name, updatedPerson.Name, "UpdatePerson: Name should be updated")
+    Do $$$AssertEquals(returnedPerson.Title, updatedPerson.Title, "UpdatePerson: Title should be updated")
+    Do $$$AssertEquals(returnedPerson.Company, updatedPerson.Company, "UpdatePerson: Company should be updated")
+    Do $$$AssertEquals(returnedPerson.Phone, updatedPerson.Phone, "UpdatePerson: Phone should be updated")
+
+    // --- Negative case: 400 Bad Request for ID mismatch ---
+    #Dim mismatchPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set mismatchPerson.ID = pId + 1
+    Set mismatchPerson.Name = "Mismatch Name"
+
+    Set httpMismatch = ..UpdatePerson(pId, mismatchPerson)
+    Set mismatchString = httpMismatch.Data.Read()
+    #Dim error400 As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error).%New()
+    Set sc = error400.%JSONImport(mismatchString)
+
+    Do $$$AssertEquals(httpMismatch.StatusCode, 400, "UpdatePerson should return 400 Bad Request for ID mismatch")
+    Do $$$AssertStatusOK(sc, "UpdatePerson: Response should be a valid Error object for mismatch")
+    Do $$$AssertEquals(error400.code, 400, "UpdatePerson: Error code should be 400")
+    Do $$$AssertNotEquals(error400.message, "", "UpdatePerson: Error message should be non-empty")
+
+    // --- Negative case: 404 Not Found for non-existent ID ---
+    Set missingId = 987654321
+    #Dim missingPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set missingPerson.ID = missingId
+    Set missingPerson.Name = "Ghost Person"
+
+    Set httpMissing = ..UpdatePerson(missingId, missingPerson)
+    Set missingString = httpMissing.Data.Read()
+    #Dim error404 As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error).%New()
+    Set sc = error404.%JSONImport(missingString)
+
+    Do $$$AssertEquals(httpMissing.StatusCode, 404, "UpdatePerson should return 404 Not Found for non-existent ID")
+    Do $$$AssertStatusOK(sc, "UpdatePerson: Response should be a valid Error object for missing ID")
+    Do $$$AssertEquals(error404.code, 404, "UpdatePerson: Error code should be 404")
+    Do $$$AssertNotEquals(error404.message, "", "UpdatePerson: Error message should be non-empty")
+}
+```
+
+Tests for `deletePerson`:
+```objectscript
+/// Test for deletePerson
+Method TestDeletePerson()
+{
+    // --- Arrange: create a Person to delete ---
+    #Dim person As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set person.Name = "Delete Me"
+    Set person.Title = "Temp"
+    Set person.Company = "InterSystems"
+    Set person.Phone = "555-444-5555"
+    Set person.DOB = $zdateh("1999-12-31", 3)
+
+    Set httpCreate = ..CreatePerson(person)
+
+    // Parse create response
+    Set createString = httpCreate.Data.Read()
+    #Dim createdPerson As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Person).%New()
+    Set sc = createdPerson.%JSONImport(createString)
+
+    Do $$$AssertStatusOK(sc, "DeletePerson: Person object for the test should be created successfully")
+    Do $$$AssertNotEquals(createdPerson.ID, "", "DeletePerson: Created Person should have a non-empty ID")
+
+    // --- Act: delete the Person record ---
+    Set pId = createdPerson.ID
+    Set httpResponse = ..DeletePerson(pId)
+
+    // --- Assertions for 204 No Content ---
+    Do $$$AssertEquals(httpResponse.StatusCode, 204, "DeletePerson should return 204 No Content on successful deletion")
+
+    // --- Verify that the Person no longer exists ---
+    Set httpGet = ..GetPersonById(pId)
+    Set getString = httpGet.Data.Read()
+    #Dim error404 As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error).%New()
+    Set sc = error404.%JSONImport(getString)
+
+    Do $$$AssertEquals(httpGet.StatusCode, 404, "DeletePerson: Subsequent GetPersonById should return 404 after deletion")
+    Do $$$AssertStatusOK(sc, "DeletePerson: Response should be a valid Error object after deletion")
+    Do $$$AssertEquals(error404.code, 404, "DeletePerson: Error code should be 404 after deletion")
+    Do $$$AssertNotEquals(error404.message, "", "DeletePerson: Error message should be non-empty after deletion")
+
+    // --- Negative case: delete a non-existent ID ---
+    Set missingId = 987654321
+    Set httpMissing = ..DeletePerson(missingId)
+    Set missingString = httpMissing.Data.Read()
+    #Dim errorMissing As dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error = ##Class(dc.musketeers.irisOasTestGenDemo.personApi.tests.model.Error).%New()
+    Set sc = errorMissing.%JSONImport(missingString)
+
+    Do $$$AssertEquals(httpMissing.StatusCode, 404, "DeletePerson should return 404 Not Found for non-existent ID")
+    Do $$$AssertStatusOK(sc, "DeletePerson: Response should be a valid Error object for missing ID")
+    Do $$$AssertEquals(errorMissing.code, 404, "DeletePerson: Error code should be 404 for missing ID")
+    Do $$$AssertNotEquals(errorMissing.message, "", "DeletePerson: Error message should be non-empty for missing ID")
+}
+```
+
 ---
 
 # Limitations / Roadmap

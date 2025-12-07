@@ -4,3 +4,8 @@ iris-main.log
 .git
 tmp
 java/target
+vscode-extension/out/
+vscode-extension/node_modules/
+*.vsix
+vscode-extension/.vscode-test/
+.vscode-test/

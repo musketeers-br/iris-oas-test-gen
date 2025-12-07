@@ -1,12 +1,14 @@
 /// Simple CRUD operations Person model with arrays and file upload<br/>
 /// Business logic class defined by OpenAPI in dc.musketeers.irisOasTestGenDemo.personApi.spec<br/>
-/// Created Dec 2, 2025 20:24:30
+/// Updated Dec 7, 2025 03:42:58
 Class dc.musketeers.irisOasTestGenDemo.personApi.impl Extends %REST.Impl [ ProcedureBlock ]
 {
 
 Parameter ExposeServerExceptions = 1;
 
-/// Create a new Person record
+/// Create a new Person record<br/>
+/// The method arguments hold values for:<br/>
+///     person, Person object to be created<br/>
 ClassMethod createPerson(person As %DynamicObject) As %DynamicObject
 {
     Try {
@@ -52,7 +54,9 @@ ClassMethod listPeople() As %DynamicObject
     }
 }
 
-/// Retrieve a single Person record by ID
+/// Retrieve a single Person record by ID<br/>
+/// The method arguments hold values for:<br/>
+///     id, ID (OID) of the Person to operate on<br/>
 ClassMethod getPersonById(id As %Integer) As %DynamicObject
 {
     Try {
@@ -93,7 +97,10 @@ ClassMethod getPersonById(id As %Integer) As %DynamicObject
     }
 }
 
-/// Update an existing Person record by ID
+/// Update an existing Person record by ID<br/>
+/// The method arguments hold values for:<br/>
+///     id, ID (OID) of the Person to operate on<br/>
+///     person, Updated Person object<br/>
 ClassMethod updatePerson(id As %Integer, person As %DynamicObject) As %DynamicObject
 {
     Set obj = ##class(dc.musketeers.irisOasTestGenDemo.personApi.Person).%OpenId(id)
@@ -132,7 +139,9 @@ ClassMethod updatePerson(id As %Integer, person As %DynamicObject) As %DynamicOb
     }
 }
 
-/// Delete a Person record by ID
+/// Delete a Person record by ID<br/>
+/// The method arguments hold values for:<br/>
+///     id, ID (OID) of the Person to operate on<br/>
 ClassMethod deletePerson(id As %Integer) As %Stream.Object
 {
     Set obj = ##class(dc.musketeers.irisOasTestGenDemo.personApi.Person).%OpenId(id)

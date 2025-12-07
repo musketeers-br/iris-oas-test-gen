@@ -176,8 +176,7 @@ ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", pa
         Do $ZF(-1, "rm -rf " _ outputDir _ "/.op*")
 
         // Enable writing for other users
-        Set firstSubDir = $PIECE(packageDir, "/", 1)
-        Do $ZF(-1, "chmod -R o+w " _ outputDir _ "/" _ sourceFolder _"/" _ firstSubDir)
+        Do $ZF(-1, "chmod -R o+w " _ outputDir _ "/" _ sourceFolder _"/" _ packageDir)
 
         // Load the test files
         Do $SYSTEM.OBJ.Import(outputDir _ "/" _ sourceFolder _"/" _ packageDir)

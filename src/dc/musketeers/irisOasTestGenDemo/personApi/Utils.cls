@@ -52,7 +52,7 @@ ClassMethod Build()
 	// Generated files package name
 	Set packageName = "dc.musketeers.irisOasTestGenDemo.personApi.tests"
 	// Run the generator
-	Write ##class(dc.musketeers.irisOasTestGen.Main).BuildAndDeploy(openapiFile, outputDir, packageName)
+	$$$ThrowOnError(##class(dc.musketeers.irisOasTestGen.Main).BuildAndDeploy(openapiFile, outputDir, packageName))
 }
 
 }

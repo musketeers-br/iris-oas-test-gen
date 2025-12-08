@@ -167,11 +167,6 @@ ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", pa
         // Run the generator
         $$$ThrowOnError(..Run(openapiFile, outputDir, packageName))
 
-        // Display the generator output
-        Set tmpDir = "/" _ $PIECE(##class(%Library.File).TempFilename(), "/", 2)
-        Set tmpFilePattern = tmpDir _ "/*.irisoasgen.log"
-        Do $ZF(-1, "cat $(ls -t "_ tmpFilePattern _" | head -n 1)")
-
         // Delete non needed artifacts
         Do $ZF(-1, "rm -rf " _ outputDir _ "/.op*")
 
@@ -183,6 +178,11 @@ ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", pa
     } Catch(ex) {
         Set sc = ex.AsStatus()
     }
+
+    // Display the generator output
+    Set tmpDir = "/" _ $PIECE(##class(%Library.File).TempFilename(), "/", 2)
+    Set tmpFilePattern = tmpDir _ "/*.irisoasgen.log"
+    Do $ZF(-1, "cat $(ls -t "_ tmpFilePattern _" | head -n 1)")
 
     Return sc
 }

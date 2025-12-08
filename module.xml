@@ -15,6 +15,19 @@
       <AfterInstallMessage>
         Module installed successfully! 
       </AfterInstallMessage>
+      <WebApplication 
+        Name="/iris-oas-test-gen/api" 
+        NameSpace="{$namespace}"
+        Path="/src"
+        Recurse="1"
+        Directory="{$cspdir}iris-oas-test-gen/api" 
+        MatchRoles=":%All"
+        AutheEnabled="#{$$$AutheCache + $$$AutheUnauthenticated}"
+        DispatchClass="dc.musketeers.irisOasTestGen.service.API" 
+        ServeFiles="1"
+        CookiePath="/csp/iris-oas-test-gen/api"
+        UseCookies="2"
+      />
     </Module>
   </Document>
 </Export>

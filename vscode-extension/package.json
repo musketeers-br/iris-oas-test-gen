@@ -1,0 +1,89 @@
+{
+    "name": "iris-oas-test-generator",
+    "displayName": "IRIS OAS Upload & Gen",
+    "version": "0.0.1",
+    "author": {
+        "name": "Musketeers-br",
+        "url": "https://musketeers-br.github.io/musketeers/"
+    },
+    "icon": "media/logo.png",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/musketeers-br/iris-oas-test-gen"
+    },
+    "publisher": "3musketeers-br",
+    "engines": {
+        "vscode": "^1.70.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "objectscript",
+        "intersystems",
+        "OpenAPI"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "configuration": {
+            "title": "IRIS OAS Test Generator",
+            "properties": {
+                "irisOasGenerator.url": {
+                    "type": "string",
+                    "default": "http://localhost:52773/iris-oas-test-gen/api/generate-upload",
+                    "description": "Full endpoint of the REST service"
+                },
+                "irisOasGenerator.remoteTempDir": {
+                    "type": "string",
+                    "default": "/tmp",
+                    "description": "Temporary folder INSIDE the IRIS server to receive the JSON file"
+                },
+                "irisOasGenerator.remoteOutputDir": {
+                    "type": "string",
+                    "default": "/tmp/output",
+                    "description": "Output folder INSIDE the IRIS server"
+                },
+                "irisOasGenerator.auth.username": {
+                    "type": "string",
+                    "default": "_SYSTEM"
+                },
+                "irisOasGenerator.auth.password": {
+                    "type": "string",
+                    "default": "SYS"
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "iris-oas-generator.uploadAndGen",
+                "title": "Generate IRIS Client (Upload)",
+                "icon": "$(cloud-upload)"
+            }
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "iris-oas-generator.uploadAndGen",
+                    "group": "navigation",
+                    "when": "resourceExtname == .json && irisOasGenerator:isOpenApi"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+    "devDependencies": {
+        "@types/node": "16.x",
+        "@types/vscode": "^1.70.0",
+        "typescript": "^4.7.4"
+    },
+    "dependencies": {
+        "axios": "^1.13.2"
+    }
+}

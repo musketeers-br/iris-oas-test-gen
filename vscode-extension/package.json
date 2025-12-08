@@ -3,21 +3,22 @@
     "displayName": "IRIS OAS Upload & Gen",
     "version": "0.0.1",
     "author": {
-    "name": "Musketeers-br",
-    "url": "https://musketeers-br.github.io/musketeers/"
-  },
-  "publisher": "3musketeers-br",
+        "name": "Musketeers-br",
+        "url": "https://musketeers-br.github.io/musketeers/"
+    },
+    "icon": "media/logo.png",
+    "publisher": "3musketeers-br",
     "engines": {
         "vscode": "^1.70.0"
     },
     "categories": [
-    "Other"
-  ],
-  "keywords": [
-    "objectscript",
-    "intersystems",
-    "OpenAPI"
-  ],
+        "Other"
+    ],
+    "keywords": [
+        "objectscript",
+        "intersystems",
+        "OpenAPI"
+    ],
     "activationEvents": [
         "onStartupFinished"
     ],

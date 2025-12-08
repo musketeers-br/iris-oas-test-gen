@@ -148,11 +148,13 @@ ClassMethod Run(openapiSpec As %String, outputDir As %String = "", packageName A
 ///    - openapiFile (%String): Path to the OpenAPI specification file.
 ///    - outputDir (%String): [Optional] Directory to output the generated code.
 ///    - packageName (%String): [Optional] The package name for the generated classes.
+///    - templateLocation (%String): [Optional] Path to a directory with custom templates for the generator.
+///    - main (Main): [Internal] An instance of the Main class, primarily for testing purposes.
 /// 
 /// Returns:
 ///    - %Status: The status of the operation. Returns $$$OK on success.
 /// </pre>
-ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", packageName As %String = "") As %Status
+ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", packageName As %String = "", templateLocation As %String = "", main As Main = {$$$NULLOREF}) As %Status
 {
     Set sc = $$$OK
 
@@ -165,7 +167,7 @@ ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", pa
         Do $ZF(-1, "rm -rf " _ outputDir _ "/" _ sourceFolder _"/" _ packageDir)
 
         // Run the generator
-        $$$ThrowOnError(..Run(openapiFile, outputDir, packageName))
+        $$$ThrowOnError(..Run(openapiFile, outputDir, packageName, templateLocation, main))
 
         // Delete non needed artifacts
         Do $ZF(-1, "rm -rf " _ outputDir _ "/.op*")

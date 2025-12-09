@@ -83,8 +83,10 @@ You must configure a Web Application in the IRIS Management Portal to expose the
 ## 👥 Credits
 
 Developed with ❤️ by the **Musketeers Team**:
-* [José Roberto Pereira](https://github.com/Jose-Roberto-Pereira)
-* [Henry Pereira](https://github.com/henry-hamon)
-* [Henrique Dias](https://github.com/diashenrique)
 
+* [José Roberto Pereira](https://community.intersystems.com/user/jos%C3%A9-roberto-pereira-0)
+* [Henry Pereira](https://community.intersystems.com/user/henry-pereira)
+* [Henrique Dias](https://community.intersystems.com/user/henrique-dias-2)
+
+![3Musketeers-br](./assets/3musketeers.png)
 **Repository:** [GitHub](https://github.com/musketeers-br/iris-oas-test-gen)

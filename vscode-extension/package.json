@@ -1,7 +1,7 @@
 {
     "name": "iris-oas-test-generator",
     "displayName": "IRIS OAS Upload & Gen",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": {
         "name": "Musketeers-br",
         "url": "https://musketeers-br.github.io/musketeers/"

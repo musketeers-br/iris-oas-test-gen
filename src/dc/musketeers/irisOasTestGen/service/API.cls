@@ -15,13 +15,13 @@ ClassMethod GenerateFromUpload() As %Status
     Set tempFile = ""
     
     Try {
-        Set content = %request.Content
+        Set content =##class(%DynamicAbstractObject).%FromJSON(%request.Content) 
         If '$IsObject(content) Set content = {}.%FromJSON(content)
         
         Set base64Data = content.base64
         Set remoteTempDir = content.remoteTempDir
         Set outputDir = content.outputDir
-        
+
         If (base64Data = "") || (remoteTempDir = "") || (outputDir = "") {
             Set result.status = "error"
             Set result.message = "Required parameters are missing: base64, remoteTempDir, or outputDir."

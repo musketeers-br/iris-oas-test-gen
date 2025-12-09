@@ -6,5 +6,4 @@ tsconfig.json
 vsc-extension-quickstart.md
 **/*.map
 **/*.ts
-node_modules/**
-!node_modules/axios/**
+*.log

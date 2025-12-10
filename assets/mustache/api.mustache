@@ -1,0 +1,150 @@
+Import {{modelPackage}}
+
+Class {{apiPackage}}.Tests{{classname}} Extends %UnitTest.TestCase
+{
+
+/// The base URL of the API
+Parameter BasePath = "{{host}}{{basePath}}";
+
+/// Preparation method for the whole test
+Method OnBeforeAllTests() As %Status
+{
+	Return $$$OK
+}
+
+/// Cleanup method for the whole test
+Method OnAfterAllTests() As %Status
+{
+	Return $$$OK
+}
+
+/// Preparation method for each test
+Method OnBeforeOneTests(testname As %String) As %Status
+{
+	Return $$$OK
+}
+
+/// Cleanup method for each test
+Method OnAfterOneTest() As %Status
+{
+	Do ##Class(dc.musketeers.irisOasTestGenDemo.personApi.Person).%KillExtent()
+	Return $$$OK
+}
+
+{{#operations}}
+{{#operation}}
+{{#vendorExtensions.x-crud-operation}}
+{{#vendorExtensions.x-crud-operation-create}}
+{{#responses}}
+/// Test for {{operationId}} with response code {{code}}
+Method Test{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}ResponseCode{{code}}()
+{
+    {{#bodyParams}}
+    Set resource = ##Class({{dataType}}).%New()
+    #; // Set here the resource properties to test the API
+    #; Set resource.property = "some value"
+    #; ...
+    {{/bodyParams}}
+
+    // Execute the operation
+    Set httpResponse = ..{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
+        resource
+    )
+    
+    // Parse the JSON Response
+    Set responseString = httpResponse.Data.Read()
+    Set response = ##Class({{baseType}}).%New()
+    Set sc = response.%JSONImport(responseString)
+
+    // Response Body Type Check
+    Do $$$AssertStatusOK(sc, "{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}: Response should be a valid {{dataType}} object")
+
+    // Status Code Check
+    Do $$$AssertEquals(httpResponse.StatusCode, {{code}}, "{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}: Should return {{code}}")
+}
+
+{{/responses}}
+{{/vendorExtensions.x-crud-operation-create}}
+{{/vendorExtensions.x-crud-operation}}
+{{^vendorExtensions.x-crud-operation}}
+/// Test for {{operationId}} (no custom spec property found, so renders only the scaffold)
+Method Test{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}()
+{
+    // TODO:
+    {{#allParams}}
+    // Set p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}} = ""
+    {{/allParams}}
+    // Set httpResponse = ..{{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}(
+        {{#allParams}}
+    //     p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}{{^-last}},{{/-last}}
+        {{/allParams}}
+    // )
+}
+{{/vendorExtensions.x-crud-operation}}
+
+{{/operation}}
+{{/operations}}
+/// Helper method to create parameter objects expected by SendRequest
+Method MakeParamObject(pName As %String, pValue) As %RegisteredObject
+{
+    Set paramObj = ##class(%RegisteredObject).%New()
+    Set paramObj.Name = pName
+    Set paramObj.Value = pValue
+    Return paramObj
+}
+
+{{#operations}}
+{{#operation}}
+/// {{summary}}
+/// OperationId: {{operationId}}
+Method {{#lambda.pascalcase}}{{operationId}}{{/lambda.pascalcase}}({{#allParams}}p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}} As {{dataType}}{{^-last}},{{/-last}}{{/allParams}}) As %Net.HttpResponse
+{
+    Set path = "{{path}}"
+    Set queryParams = ""
+    Set bodyStream = ""
+    Set headers = ##class(%ListOfDataTypes).%New()
+    Set formParams = ##class(%ListOfDataTypes).%New()
+    Set multipartParams = ##class(%ListOfDataTypes).%New()
+    
+    {{#pathParams}}
+    Set path = $REPLACE(path, "{{=<% %>=}}{<%paramName%>}<%={{ }}=%>", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}})
+    {{/pathParams}}
+    {{#queryParams}}
+
+    Set queryParams = queryParams _ "&" _ "{{name}}=" _ p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}
+    If $EXTRACT(queryParams) = "&" Set queryParams = "?" _ $EXTRACT(queryParams, 2, *)
+    {{/queryParams}}
+    
+    {{#headerParams}}
+
+    // Header parameter: {{name}}
+    Do headers.Insert(..MakeParamObject("{{name}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}))
+    {{/headerParams}}
+    
+    {{#formParams}}
+        {{#isFile}}
+        // Multipart/form-data file parameter: {{name}}
+        Do multipartParams.Insert(..MakeParamObject("{{name}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}))
+        {{/isFile}}
+        {{^isFile}}
+        // Form parameter (x-www-form-urlencoded): {{name}}
+        Do formParams.Insert(..MakeParamObject("{{name}}", p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}))
+        {{/isFile}}
+    {{/formParams}}
+    
+    {{#bodyParam}}
+
+    // Handle body
+    $$$ThrowOnError(p{{#lambda.pascalcase}}{{paramName}}{{/lambda.pascalcase}}.%JSONExportToStream(.bodyStream))
+    {{/bodyParam}}
+
+    Set request = ##class({{x-musketeers-package-name}}.utils.HttpUtils).%New()
+    Set request.BasePath = ..#BasePath
+    Set request.HttpRequest.Https = 1
+    Set httpResponse = request.SendRequest("{{httpMethod}}", path, queryParams, bodyStream, headers, formParams, multipartParams)
+    Return httpResponse
+}
+
+{{/operation}}
+{{/operations}}
+}

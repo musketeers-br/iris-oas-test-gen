@@ -74,6 +74,8 @@
         "tags": [
           "Person"
         ],
+        "x-crud-operation": "",
+        "x-crud-operation-create": "",
         "summary": "Create a new Person record",
         "operationId": "createPerson",
         "consumes": [

@@ -14,6 +14,7 @@ docker exec -it iris-oas-test-gen-iris-1 /bin/bash -c "cp -rf /home/irisowner/de
 
 openapiFile="/home/irisowner/dev/assets/person-api.json" && \
 outputDir="/home/irisowner/dev/tests" && \
-# packageName="sample.personapi"
-packageName="dc.musketeers.irisOasTestGenDemo.personApi.tests"
-docker exec -it iris-oas-test-gen-iris-1 /usr/bin/iris session iris -U IRISAPP "##class(dc.musketeers.irisOasTestGen.Main).BuildAndDeploy(\"$openapiFile\",\"$outputDir\",\"$packageName\")"
+# packageName="sample.personapi" && \
+packageName="dc.musketeers.irisOasTestGenDemo.personApi.tests" && \
+template="/home/irisowner/dev/assets/mustache" &&\
+docker exec -it iris-oas-test-gen-iris-1 /usr/bin/iris session iris -U IRISAPP "##class(dc.musketeers.irisOasTestGen.Main).BuildAndDeploy(\"$openapiFile\",\"$outputDir\",\"$packageName\",\"$template\")"

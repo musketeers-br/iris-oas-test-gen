@@ -16,6 +16,9 @@ Property PackageName As %String;
 /// Custom template location
 Property TemplateLocation As %String;
 
+/// Debug mode
+Property Debug As %Boolean;
+
 /// Used to execute external commands
 Property Shell As SystemShell;
 
@@ -35,6 +38,8 @@ Method %OnNew(shell As SystemShell = {$$$NULLOREF}) As %Status
     If ..PackageName = "" {
         Set ..PackageName = "mypackage"
     }
+
+    Set ..Debug = 0
     
 	Return $$$OK
 }
@@ -80,6 +85,11 @@ Method Generate() As %Status
             Set args($INCREMENT(args)) = "-t"
             Set args($INCREMENT(args)) = ..TemplateLocation
         }
+        If ..Debug {
+            Set args($INCREMENT(args)) = "--global-property"
+            #; Set args($INCREMENT(args)) = "debugOpenAPI=true,debugSupportingFiles=true,models,modelDocs,modelTests,apis,apiTests,apiDocs"
+            Set args($INCREMENT(args)) = "debugSupportingFiles=true"
+        }
         Set flags = "/STDOUT="""_outFile_"""/STDERR="""_outFile_""""
         Set exitCode = ..Shell.Execute(flags, program, args...)
 
@@ -111,12 +121,13 @@ Method Generate() As %Status
 ///    - outputDir (%String): [Optional] Directory to output the generated code. Defaults to &lt;install_dir&gt;/lib/iris-oas-test-gen/generated-iris-client.
 ///    - packageName (%String): [Optional] The package name for the generated classes. Defaults to 'mypackage'.
 ///    - templateLocation (%String): [Optional] Path to a directory with custom templates for the generator.
+///    - debug (%Boolean): [Optional] Enable debug mode. Defaults to false.
 ///    - main (Main): [Internal] An instance of the Main class, primarily for testing purposes.
 /// 
 /// Returns:
 ///    - %Status: The status of the generation process. Returns $$$OK on success.
 /// </pre>
-ClassMethod Run(openapiSpec As %String, outputDir As %String = "", packageName As %String = "", templateLocation As %String = "", main As Main = {$$$NULLOREF}) As %Status
+ClassMethod Run(openapiSpec As %String, outputDir As %String = "", packageName As %String = "", templateLocation As %String = "", debug As %Boolean = 0, main As Main = {$$$NULLOREF}) As %Status
 {
     If main = $$$NULLOREF {
         Set main = ##class(Main).%New()
@@ -149,12 +160,13 @@ ClassMethod Run(openapiSpec As %String, outputDir As %String = "", packageName A
 ///    - outputDir (%String): [Optional] Directory to output the generated code.
 ///    - packageName (%String): [Optional] The package name for the generated classes.
 ///    - templateLocation (%String): [Optional] Path to a directory with custom templates for the generator.
+///    - debug (%Boolean): [Optional] Enable debug mode. Defaults to false.
 ///    - main (Main): [Internal] An instance of the Main class, primarily for testing purposes.
 /// 
 /// Returns:
 ///    - %Status: The status of the operation. Returns $$$OK on success.
 /// </pre>
-ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", packageName As %String = "", templateLocation As %String = "", main As Main = {$$$NULLOREF}) As %Status
+ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", packageName As %String = "", templateLocation As %String = "", debug As %Boolean = 0, main As Main = {$$$NULLOREF}) As %Status
 {
     Set sc = $$$OK
 
@@ -168,7 +180,18 @@ ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", pa
 
         // Run the generator
         $$$ThrowOnError(..Run(openapiFile, outputDir, packageName, templateLocation, main))
+    } Catch(ex) {
+        Set sc = ex.AsStatus()
+    }
 
+    // Display the generator output
+    Set tmpDir = "/" _ $PIECE(##class(%Library.File).TempFilename(), "/", 2)
+    Set tmpFilePattern = tmpDir _ "/*.irisoasgen.log"
+    Do $ZF(-1, "cat $(ls -t "_ tmpFilePattern _" | head -n 1)")
+
+    Return:($$$ISERR(sc)) sc
+
+    Try {
         // Delete non needed artifacts
         Do $ZF(-1, "rm -rf " _ outputDir _ "/.op*")
 
@@ -180,11 +203,6 @@ ClassMethod BuildAndDeploy(openapiFile As %String, outputDir As %String = "", pa
     } Catch(ex) {
         Set sc = ex.AsStatus()
     }
-
-    // Display the generator output
-    Set tmpDir = "/" _ $PIECE(##class(%Library.File).TempFilename(), "/", 2)
-    Set tmpFilePattern = tmpDir _ "/*.irisoasgen.log"
-    Do $ZF(-1, "cat $(ls -t "_ tmpFilePattern _" | head -n 1)")
 
     Return sc
 }
